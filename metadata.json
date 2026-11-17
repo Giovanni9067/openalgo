@@ -1,0 +1,5 @@
+{
+  "name": "OpenAlgo",
+  "description": "Open Source Algorithmic Trading Platform with Unified Broker API, Sandbox Analyzer, Order Management, and Flow Automation.",
+  "requestFramePermissions": []
+}

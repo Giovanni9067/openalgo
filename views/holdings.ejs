@@ -1,0 +1,53 @@
+<%- include('./partials/head') %>
+
+<div class="grid-4">
+  <div class="card">
+    <div class="metric-label">Total Holding Value</div>
+    <div class="metric-value">₹<%= Number(totalValue).toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></div>
+  </div>
+  <div class="card">
+    <div class="metric-label">Total Holdings P&amp;L</div>
+    <div class="metric-value <%= Number(totalPnl) >= 0 ? 'text-green' : 'text-red' %>">
+      ₹<%= Number(totalPnl).toLocaleString('en-IN', { minimumFractionDigits: 2 }) %>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Equity Holdings (<%= holdings.length %>)</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Exchange</th>
+          <th class="num">Qty</th>
+          <th class="num">Avg Price</th>
+          <th class="num">LTP</th>
+          <th class="num">P&amp;L</th>
+          <th class="num">Return %</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (holdings.length === 0) { %>
+          <tr><td colspan="7" class="text-muted">No holdings found.</td></tr>
+        <% } %>
+        <% for (const h of holdings) { %>
+          <tr>
+            <td class="mono"><strong><%= h.symbol %></strong></td>
+            <td><span class="exch-tag"><%= h.exchange %></span></td>
+            <td class="num"><%= h.quantity %></td>
+            <td class="num"><%= h.average_price.toFixed(2) %></td>
+            <td class="num"><%= h.ltp.toFixed(2) %></td>
+            <td class="num <%= h.pnl >= 0 ? 'text-green' : 'text-red' %>"><%= h.pnl.toFixed(2) %></td>
+            <td class="num <%= h.pnlpercent >= 0 ? 'text-green' : 'text-red' %>"><%= h.pnlpercent.toFixed(2) %>%</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('./partials/foot') %>

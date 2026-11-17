@@ -1,0 +1,61 @@
+<%- include('./partials/head') %>
+
+<% if (flash) { %>
+  <div class="flash"><%= flash %></div>
+<% } %>
+
+<div class="card" style="margin-bottom:18px;">
+  <div class="card-header">
+    <h2 class="card-title">API Analyzer Request Log (<%= logs.length %>)</h2>
+    <span class="badge <%= analyzeMode ? 'badge-amber' : 'badge-green' %>">
+      <%= analyzeMode ? 'ANALYZER ACTIVE' : 'LIVE MODE' %>
+    </span>
+  </div>
+  <p class="text-muted" style="margin:0;">
+    Inspects payloads and responses routed through <span class="mono">/api/v1/*</span>. Use the <a href="/playground">API Playground</a> to fire test calls.
+  </p>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Endpoint</th>
+          <th>Source</th>
+          <th>Symbol</th>
+          <th>Status</th>
+          <th>Request / Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (logs.length === 0) { %>
+          <tr><td colspan="6" class="text-muted">No API v1 calls logged yet. Test an endpoint in API Playground.</td></tr>
+        <% } %>
+        <% for (const log of logs) { %>
+          <tr>
+            <td class="mono text-muted"><%= log.timestamp %></td>
+            <td class="mono"><strong>/api/v1/<%= log.api_type %></strong></td>
+            <td><%= log.source %></td>
+            <td class="mono"><%= log.symbol ? `${log.symbol} (${log.exchange || ''})` : '—' %></td>
+            <td>
+              <span class="badge <%= log.status === 'success' ? 'badge-green' : 'badge-red' %>"><%= log.status %></span>
+            </td>
+            <td>
+              <details>
+                <summary class="mono" style="cursor:pointer; color:#93c5fd;">Inspect JSON</summary>
+                <div style="margin-top:8px; display:grid; gap:6px;">
+                  <pre class="json-box"><%= JSON.stringify(log.request_data, null, 2) %></pre>
+                  <pre class="json-box"><%= JSON.stringify(log.response_data, null, 2) %></pre>
+                </div>
+              </details>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('./partials/foot') %>

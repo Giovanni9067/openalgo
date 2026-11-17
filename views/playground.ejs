@@ -1,0 +1,99 @@
+<%- include('./partials/head') %>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">REST API v1 Request Builder</h2>
+      <span class="badge badge-blue">POST JSON</span>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label for="endpointSelect">Endpoint Preset</label>
+      <select id="endpointSelect" onchange="loadPreset()">
+        <option value="/api/v1/placeorder">POST /api/v1/placeorder</option>
+        <option value="/api/v1/quotes">POST /api/v1/quotes</option>
+        <option value="/api/v1/funds">POST /api/v1/funds</option>
+        <option value="/api/v1/orderbook">POST /api/v1/orderbook</option>
+        <option value="/api/v1/positionbook">POST /api/v1/positionbook</option>
+        <option value="/api/v1/tradebook">POST /api/v1/tradebook</option>
+        <option value="/api/v1/holdings">POST /api/v1/holdings</option>
+        <option value="/api/v1/ping">POST /api/v1/ping</option>
+      </select>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label for="payloadBox">Request JSON Body</label>
+      <textarea id="payloadBox" rows="13"></textarea>
+    </div>
+    <button type="button" class="btn" onclick="sendRequest()">Send API Request</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Response</h2>
+      <span id="statusBadge" class="badge">READY</span>
+    </div>
+    <pre id="responseBox" class="json-box" style="min-height:280px;">Click "Send API Request" to invoke the endpoint.</pre>
+  </div>
+</div>
+
+<script>
+const API_KEY = <%- JSON.stringify(apiKey) %>;
+const PRESETS = {
+  '/api/v1/placeorder': {
+    apikey: API_KEY,
+    strategy: 'Playground Test',
+    exchange: 'NSE',
+    symbol: 'NHPC',
+    action: 'BUY',
+    product: 'MIS',
+    pricetype: 'MARKET',
+    quantity: 10,
+    price: 0,
+    trigger_price: 0,
+    disclosed_quantity: 0
+  },
+  '/api/v1/quotes': {
+    apikey: API_KEY,
+    symbol: 'SBIN',
+    exchange: 'NSE'
+  },
+  '/api/v1/funds': { apikey: API_KEY },
+  '/api/v1/orderbook': { apikey: API_KEY },
+  '/api/v1/positionbook': { apikey: API_KEY },
+  '/api/v1/tradebook': { apikey: API_KEY },
+  '/api/v1/holdings': { apikey: API_KEY },
+  '/api/v1/ping': { apikey: API_KEY }
+};
+
+function loadPreset() {
+  const path = document.getElementById('endpointSelect').value;
+  document.getElementById('payloadBox').value = JSON.stringify(PRESETS[path] || { apikey: API_KEY }, null, 2);
+}
+
+async function sendRequest() {
+  const path = document.getElementById('endpointSelect').value;
+  const badge = document.getElementById('statusBadge');
+  const out = document.getElementById('responseBox');
+  badge.textContent = 'SENDING...';
+  badge.className = 'badge badge-amber';
+  try {
+    const body = JSON.parse(document.getElementById('payloadBox').value);
+    const res = await fetch(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    badge.textContent = `HTTP ${res.status}`;
+    badge.className = res.ok ? 'badge badge-green' : 'badge badge-red';
+    out.textContent = JSON.stringify(data, null, 2);
+  } catch (err) {
+    badge.textContent = 'ERROR';
+    badge.className = 'badge badge-red';
+    out.textContent = String(err);
+  }
+}
+
+loadPreset();
+</script>
+
+<%- include('./partials/foot') %>

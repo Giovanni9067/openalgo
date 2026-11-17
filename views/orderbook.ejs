@@ -1,0 +1,84 @@
+<%- include('./partials/head') %>
+
+<% if (flash) { %>
+  <div class="flash"><%= flash %></div>
+<% } %>
+
+<div class="grid-4">
+  <div class="card">
+    <div class="metric-label">Buy Orders</div>
+    <div class="metric-value"><%= orderStats.total_buy_orders %></div>
+  </div>
+  <div class="card">
+    <div class="metric-label">Sell Orders</div>
+    <div class="metric-value"><%= orderStats.total_sell_orders %></div>
+  </div>
+  <div class="card">
+    <div class="metric-label">Completed</div>
+    <div class="metric-value text-green"><%= orderStats.total_completed_orders %></div>
+  </div>
+  <div class="card">
+    <div class="metric-label">Open Orders</div>
+    <div class="metric-value text-amber"><%= orderStats.total_open_orders %></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Orderbook (<%= orders.length %>)</h2>
+    <a href="/orderbook/export" class="btn btn-secondary btn-sm">Export CSV</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Order ID</th>
+          <th>Symbol</th>
+          <th>Action</th>
+          <th class="num">Qty</th>
+          <th class="num">Price</th>
+          <th>Type</th>
+          <th>Product</th>
+          <th>Strategy</th>
+          <th>Status</th>
+          <th>Manage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (orders.length === 0) { %>
+          <tr><td colspan="11" class="text-muted">No orders recorded.</td></tr>
+        <% } %>
+        <% for (const o of orders) { %>
+          <tr>
+            <td class="mono text-muted"><%= o.timestamp %></td>
+            <td class="mono"><%= o.orderid %></td>
+            <td class="mono"><strong><%= o.symbol %></strong> <span class="exch-tag"><%= o.exchange %></span></td>
+            <td><span class="badge <%= o.action === 'BUY' ? 'badge-green' : 'badge-red' %>"><%= o.action %></span></td>
+            <td class="num"><%= o.quantity %></td>
+            <td class="num"><%= o.price.toFixed(2) %></td>
+            <td><%= o.pricetype %></td>
+            <td><%= o.product %></td>
+            <td class="text-muted"><%= o.strategy %></td>
+            <td>
+              <span class="badge <%= o.order_status === 'complete' ? 'badge-green' : o.order_status === 'open' ? 'badge-blue' : 'badge-red' %>">
+                <%= o.order_status %>
+              </span>
+            </td>
+            <td>
+              <% if (o.order_status === 'open') { %>
+                <form method="post" action="/orderbook/cancel/<%= o.orderid %>" style="display:inline;">
+                  <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                </form>
+              <% } else { %>
+                <span class="text-muted">—</span>
+              <% } %>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('./partials/foot') %>

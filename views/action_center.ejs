@@ -1,0 +1,74 @@
+<%- include('./partials/head') %>
+
+<% if (flash) { %>
+  <div class="flash"><%= flash %></div>
+<% } %>
+
+<div class="card" style="margin-bottom: 18px;">
+  <div class="card-header">
+    <h2 class="card-title">Action Center — Semi-Auto Order Queue</h2>
+    <span class="badge <%= orderMode === 'semi_auto' ? 'badge-amber' : 'badge-blue' %>">
+      Current Order Mode: <%= orderMode %>
+    </span>
+  </div>
+  <p class="text-muted" style="margin:0;">
+    When Order Mode is set to <strong>semi_auto</strong> (in <a href="/apikey">API Key</a>), incoming orders from strategies or the API are queued here for manual approval before execution.
+  </p>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Created</th>
+          <th>ID</th>
+          <th>Symbol</th>
+          <th>Action</th>
+          <th class="num">Qty</th>
+          <th class="num">Price</th>
+          <th>Strategy</th>
+          <th>Status</th>
+          <th>Decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (pendingOrders.length === 0) { %>
+          <tr><td colspan="9" class="text-muted">No pending or processed semi-auto orders.</td></tr>
+        <% } %>
+        <% for (const item of pendingOrders) { %>
+          <tr>
+            <td class="mono text-muted"><%= item.created_at %></td>
+            <td class="mono"><%= item.id %></td>
+            <td class="mono"><strong><%= item.symbol %></strong> <span class="exch-tag"><%= item.exchange %></span></td>
+            <td><span class="badge <%= item.action === 'BUY' ? 'badge-green' : 'badge-red' %>"><%= item.action %></span></td>
+            <td class="num"><%= item.quantity %></td>
+            <td class="num"><%= item.price.toFixed(2) %></td>
+            <td><%= item.strategy %></td>
+            <td>
+              <span class="badge <%= item.status === 'approved' ? 'badge-green' : item.status === 'pending' ? 'badge-amber' : 'badge-red' %>">
+                <%= item.status %>
+              </span>
+            </td>
+            <td>
+              <% if (item.status === 'pending') { %>
+                <div style="display:flex; gap:6px;">
+                  <form method="post" action="/action-center/approve/<%= item.id %>">
+                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                  </form>
+                  <form method="post" action="/action-center/reject/<%= item.id %>">
+                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                  </form>
+                </div>
+              <% } else { %>
+                <span class="text-muted">Processed</span>
+              <% } %>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('./partials/foot') %>

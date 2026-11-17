@@ -1,0 +1,55 @@
+<%- include('./partials/head') %>
+
+<% if (flash) { %>
+  <div class="flash"><%= flash %></div>
+<% } %>
+
+<div class="card" style="margin-bottom:18px;">
+  <form method="get" action="/broker" style="display:flex; gap:12px; flex-wrap:wrap; align-items:end;">
+    <div style="flex:1; min-width:220px;">
+      <label for="q">Search Broker or Exchange (<%= totalCount %> plugins)</label>
+      <input id="q" name="q" value="<%= filter %>" placeholder="e.g. zerodha, dhan, MCX, CRYPTO..." />
+    </div>
+    <div style="width:160px;">
+      <label for="type">Market Type</label>
+      <select id="type" name="type">
+        <option value="all" <%= typeFilter === 'all' ? 'selected' : '' %>>All</option>
+        <option value="IN_stock" <%= typeFilter === 'IN_stock' ? 'selected' : '' %>>Indian Equities/F&amp;O</option>
+        <option value="crypto" <%= typeFilter === 'crypto' ? 'selected' : '' %>>Crypto</option>
+      </select>
+    </div>
+    <button type="submit" class="btn">Filter</button>
+    <a href="/broker" class="btn btn-secondary">Reset</a>
+  </form>
+</div>
+
+<div class="broker-grid">
+  <% for (const b of brokers) { %>
+    <div class="broker-card <%= b.id === activeBroker ? 'is-active' : '' %>">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <strong><%= b.name %></strong>
+          <span class="badge <%= b.type === 'crypto' ? 'badge-amber' : 'badge-blue' %>"><%= b.type %></span>
+        </div>
+        <div class="text-muted" style="font-size:12px; margin-bottom:10px;"><%= b.description %></div>
+        <div class="exch-list">
+          <% for (const ex of b.exchanges) { %>
+            <span class="exch-tag"><%= ex %></span>
+          <% } %>
+        </div>
+      </div>
+      <div>
+        <% if (b.id === activeBroker) { %>
+          <span class="badge badge-green" style="width:100%; justify-content:center;">ACTIVE BROKER</span>
+        <% } else { %>
+          <form method="post" action="/api/broker/select">
+            <input type="hidden" name="broker" value="<%= b.id %>" />
+            <button type="submit" class="btn btn-secondary btn-sm" style="width:100%;">Select <%= b.name %></button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+</div>
+
+<%- include('./partials/foot') %>

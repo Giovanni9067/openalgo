@@ -1,0 +1,54 @@
+<%- include('./partials/head') %>
+
+<% if (flash) { %>
+  <div class="flash"><%= flash %></div>
+<% } %>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">OpenAlgo API Key</h2>
+      <span class="badge badge-green">Active</span>
+    </div>
+    <p class="text-muted" style="margin-top:0;">
+      Pass this <span class="mono">apikey</span> in JSON payloads to <span class="mono">/api/v1/*</span> endpoints (TradingView, Amibroker, Python SDK, or REST clients).
+    </p>
+    <div style="margin-bottom:14px;">
+      <label>Current API Key</label>
+      <input id="apiKeyInput" class="mono" value="<%= apiKey %>" readonly />
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button type="button" class="btn btn-secondary" onclick="navigator.clipboard?.writeText(document.getElementById('apiKeyInput').value)">
+        Copy Key
+      </button>
+      <form method="post" action="/apikey">
+        <button type="submit" class="btn">Regenerate API Key</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Order Execution Mode</h2>
+      <span class="badge <%= orderMode === 'semi_auto' ? 'badge-amber' : 'badge-blue' %>">
+        <%= orderMode.toUpperCase() %>
+      </span>
+    </div>
+    <p class="text-muted" style="margin-top:0;">
+      <strong>Auto:</strong> API orders execute immediately.<br />
+      <strong>Semi-Auto:</strong> API orders queue in <a href="/action-center">Action Center</a> until manually approved.
+    </p>
+    <div style="display:flex; gap:10px;">
+      <form method="post" action="/apikey/mode">
+        <input type="hidden" name="mode" value="auto" />
+        <button type="submit" class="btn <%= orderMode === 'auto' ? '' : 'btn-secondary' %>">Auto Mode</button>
+      </form>
+      <form method="post" action="/apikey/mode">
+        <input type="hidden" name="mode" value="semi_auto" />
+        <button type="submit" class="btn <%= orderMode === 'semi_auto' ? '' : 'btn-secondary' %>">Semi-Auto Mode</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('./partials/foot') %>

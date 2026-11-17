@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <meta name="description" content="OpenAlgo — Open Source Algorithmic Trading Platform with Unified Broker API, Sandbox Analyzer, Order Management, and Flow Automation." />
+  <meta property="og:title" content="<%= title %>" />
+  <meta property="og:description" content="Open Source Algorithmic Trading Platform with Unified Broker API, Sandbox Analyzer, Order Management, and Flow Automation." />
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+<div class="layout">
+<%- include('./nav') %>
+<div class="main-wrap">
+  <header class="topbar">
+    <h1 class="topbar-title"><%= title.replace(' — OpenAlgo', '') %></h1>
+    <div class="topbar-meta">
+      <span class="badge <%= analyzeMode ? 'badge-amber' : 'badge-green' %>">
+        <%= analyzeMode ? 'ANALYZER MODE' : 'LIVE MODE' %>
+      </span>
+      <span class="badge badge-blue">
+        BROKER: <%= activeBrokerInfo ? activeBrokerInfo.name : activeBroker %>
+      </span>
+      <span class="badge">
+        MODE: <%= orderMode.toUpperCase() %>
+      </span>
+      <form method="post" action="/settings/analyze-mode/<%= analyzeMode ? 0 : 1 %>" style="display:inline;">
+        <button type="submit" class="btn btn-secondary btn-sm">
+          Switch to <%= analyzeMode ? 'Live' : 'Analyze' %>
+        </button>
+      </form>
+    </div>
+  </header>
+  <main class="content">

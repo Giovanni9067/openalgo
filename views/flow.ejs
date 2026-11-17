@@ -1,0 +1,86 @@
+<%- include('./partials/head') %>
+
+<% if (flash) { %>
+  <div class="flash"><%= flash %></div>
+<% } %>
+
+<div class="card" style="margin-bottom:18px;">
+  <div class="card-header">
+    <h2 class="card-title">Create Flow Workflow</h2>
+  </div>
+  <form method="post" action="/flow/api/workflows" class="form-grid" style="align-items:end;">
+    <div>
+      <label for="wfName">Workflow Name</label>
+      <input id="wfName" name="name" placeholder="e.g. VWAP Reversal Bot" required />
+    </div>
+    <div>
+      <label for="wfTrigger">Trigger Type</label>
+      <select id="wfTrigger" name="trigger_type">
+        <option value="webhook">Webhook (TradingView)</option>
+        <option value="schedule">Schedule (IST)</option>
+        <option value="price_alert">Price Alert</option>
+      </select>
+    </div>
+    <div>
+      <label for="wfDesc">Description</label>
+      <input id="wfDesc" name="description" placeholder="Action on trigger..." />
+    </div>
+    <div>
+      <button type="submit" class="btn">Create Workflow</button>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Automation Workflows (<%= workflows.length %>)</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Trigger</th>
+          <th>Nodes</th>
+          <th>State</th>
+          <th>Last Run</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (const wf of workflows) { %>
+          <tr>
+            <td class="mono">#<%= wf.id %></td>
+            <td>
+              <strong><%= wf.name %></strong>
+              <div class="text-muted" style="font-size:12px;"><%= wf.description %></div>
+            </td>
+            <td><span class="badge"><%= wf.trigger_type %></span></td>
+            <td class="mono"><%= wf.nodes_count %></td>
+            <td>
+              <span class="badge <%= wf.is_active ? 'badge-green' : 'badge-amber' %>">
+                <%= wf.is_active ? 'ACTIVE' : 'PAUSED' %>
+              </span>
+            </td>
+            <td class="mono text-muted"><%= wf.last_run_at || 'Never' %></td>
+            <td>
+              <div style="display:flex; gap:6px;">
+                <form method="post" action="/flow/api/workflows/<%= wf.id %>/toggle">
+                  <button type="submit" class="btn btn-secondary btn-sm">
+                    <%= wf.is_active ? 'Pause' : 'Activate' %>
+                  </button>
+                </form>
+                <form method="post" action="/flow/api/workflows/<%= wf.id %>/trigger">
+                  <button type="submit" class="btn btn-sm">Run Now</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('./partials/foot') %>

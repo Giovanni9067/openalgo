@@ -1,0 +1,43 @@
+<%- include('./partials/head') %>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Executed Trades (<%= trades.length %>)</h2>
+    <a href="/tradebook/export" class="btn btn-secondary btn-sm">Export CSV</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Fill Time</th>
+          <th>Order ID</th>
+          <th>Symbol</th>
+          <th>Product</th>
+          <th>Action</th>
+          <th class="num">Fill Size</th>
+          <th class="num">Fill Price</th>
+          <th class="num">Trade Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (trades.length === 0) { %>
+          <tr><td colspan="8" class="text-muted">No executed trades yet.</td></tr>
+        <% } %>
+        <% for (const t of trades) { %>
+          <tr>
+            <td class="mono text-muted"><%= t.timestamp %></td>
+            <td class="mono"><%= t.orderid %></td>
+            <td class="mono"><strong><%= t.symbol %></strong> <span class="exch-tag"><%= t.exchange %></span></td>
+            <td><%= t.product %></td>
+            <td><span class="badge <%= t.action === 'BUY' ? 'badge-green' : 'badge-red' %>"><%= t.action %></span></td>
+            <td class="num"><%= t.quantity %></td>
+            <td class="num"><%= t.average_price.toFixed(2) %></td>
+            <td class="num">₹<%= t.trade_value.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('./partials/foot') %>
